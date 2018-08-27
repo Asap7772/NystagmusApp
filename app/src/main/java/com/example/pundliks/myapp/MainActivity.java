@@ -11,7 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-
+import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -22,6 +22,15 @@ public class MainActivity extends AppCompatActivity {
     float barWidth = 0;
     float spd = 0.0f;
     float tan1deg = 0.01745506492821758576512889521973f;
+    private int screenWidth, screenHeight;
+
+    public static final String EXTRA_VERTICES = "EXTRA_VERTICES";
+    public static final String EXTRA_SPEED = "EXTRA_SPEED";
+    public static final String EXTRA_BAR_NUMBER = "EXTRA_BAR_NUMBER";
+    public static final String EXTRA_BAR_WIDTH = "EXTRA_BAR_WIDTH";
+    public static final String EXTRA_SCREEN_WIDTH = "EXTRA_SCREEN_WIDTH";
+    public static final String EXTRA_SCREEN_HEIGHT = "EXTRA_SCREEN_HEIGHT";
+    private float ppi = 570;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,24 +48,34 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                float sf = Float.valueOf(edtxtSF.getText().toString());
-                spd = Float.valueOf(edtxtSpd.getText().toString());
-                float dist = Float.valueOf(edtxtDist.getText().toString());
+                try {
+                    float sf = Float.valueOf(edtxtSF.getText().toString());
+                    spd = Float.valueOf(edtxtSpd.getText().toString());
+                    float dist = Float.valueOf(edtxtDist.getText().toString());
 
-                float[] val = ComputePatternDetails(sf, dist);
-                barWidth = val[0];
-                nbars = (int)val[1];
-                nvertices = (int)val[2];
+                    float[] val = ComputePatternDetails(sf, dist);
+                    barWidth = val[0];
+                    nbars = (int) val[1];
+                    nvertices = (int) val[2];
+                    screenWidth = (int) val[3];
+                    screenHeight = (int) val[4];
 
-                Intent intent = new Intent(view.getContext(), MyCameraActivity.class);
-                intent.putExtra("EXTRA_VERTICES", nvertices);
-                intent.putExtra("EXTRA_SPEED", spd);
-                intent.putExtra("EXTRA_Speed", spd);
-                intent.putExtra("EXTRA_Speed", spd);
-                view.getContext().startActivity(intent);
+                    Intent intent = new Intent(view.getContext(), MyCameraActivity.class);
+                    intent.putExtra(EXTRA_VERTICES, nvertices);
+                    intent.putExtra(EXTRA_SPEED, spd);
+                    intent.putExtra(EXTRA_BAR_NUMBER, nbars);
+                    intent.putExtra(EXTRA_BAR_WIDTH, barWidth);
+                    intent.putExtra(EXTRA_SCREEN_WIDTH, screenWidth);
+                    intent.putExtra(EXTRA_SCREEN_HEIGHT, screenHeight);
+                    view.getContext().startActivity(intent);
+                }catch (NumberFormatException e){
+                    e.printStackTrace();
+                    Toast.makeText(MainActivity.this,"Please Enter Query",Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -83,8 +102,8 @@ public class MainActivity extends AppCompatActivity {
     public float[] ComputePatternDetails(float sf, float dist){
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-        float ppd = dist*tan1deg*dm.densityDpi/2.54f;
+        
+        float ppd = dist*tan1deg*ppi/2.54f;
         float bw = (float)Math.floor((double)ppd/sf);
         if (bw < 2.0f)
             bw = 2.0f;
@@ -95,15 +114,15 @@ public class MainActivity extends AppCompatActivity {
         int nv = nbars*4;
 
         Log.d(TAG, "===============================");
-        Log.d(TAG, "Width = " + dm.widthPixels + ", Height = " + dm.heightPixels + ", PPI = " + dm.densityDpi);
+        Log.d(TAG, "Width = " + dm.widthPixels + ", Height = " + dm.heightPixels + ", PPI = " + ppi);
         Log.d(TAG, "ppd = " + ppd + ", bw = " + bw + ", nbars = " + nbars + ", nv = " + nv);
         Log.d(TAG, "===============================");
 
         try {
-            Thread.sleep(100);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return new float[]{bw,nbars,nv};
+        return new float[]{bw,nbars,nv, dm.widthPixels, dm.heightPixels};
     }
 }
