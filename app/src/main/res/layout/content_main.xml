@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal|top"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".MainActivity"
+    tools:showIn="@layout/activity_main">
+
+
+    <View
+        android:id="@+id/padding"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView_param1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Spatial Frequency (cpd):"
+            android:textSize="@dimen/textSize"/>
+
+        <EditText
+            android:id="@+id/editText_param1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text=""
+            android:textSize="@dimen/textSize"
+            android:inputType="number"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView_param2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Speed (dps): "
+            android:textSize="@dimen/textSize" />
+
+        <EditText
+            android:id="@+id/editText_param2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text=""
+            android:textSize="@dimen/textSize"
+            android:inputType="number"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView_param3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Distance (cm): "
+            android:textSize="@dimen/textSize" />
+
+        <EditText
+            android:id="@+id/editText_param3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text=""
+            android:textSize="@dimen/textSize"
+            android:inputType="number"/>
+    </LinearLayout>
+
+
+</LinearLayout>
