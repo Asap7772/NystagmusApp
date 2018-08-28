@@ -21,10 +21,12 @@ class MyGLSurfaceView extends GLSurfaceView {
 
     private int vertices, numBars;
     private float widthBars, speed;
-    private int screenWidth,screenHeight;
+    private int screenWidth;
+    private int screenHeight;
+    private float ppd;
     private boolean video, captured;
 
-    public MyGLSurfaceView(final Context context, int vertices, int numBars, float width, float speed, int screenWidth, int screenHeight) {
+    public MyGLSurfaceView(final Context context, int vertices, int numBars, float width, float speed, int screenWidth, int screenHeight, float ppd) {
         super(context);
         this.vertices = vertices;
         this.numBars = numBars;
@@ -32,11 +34,13 @@ class MyGLSurfaceView extends GLSurfaceView {
         this.speed = speed;
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
+        this.ppd = ppd;
+
 
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2);
 
-        mRenderer = new ParametrizedRenderer(vertices,numBars,widthBars,speed,screenWidth,screenHeight);
+        mRenderer = new ParametrizedRenderer(vertices,numBars,widthBars,speed,screenWidth,screenHeight,ppd);
 
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(mRenderer);
@@ -124,5 +128,13 @@ class MyGLSurfaceView extends GLSurfaceView {
 
     public void setCaptured(boolean captured) {
         this.captured = captured;
+    }
+
+    public float getPpd() {
+        return ppd;
+    }
+
+    public void setPpd(float ppd) {
+        this.ppd = ppd;
     }
 }

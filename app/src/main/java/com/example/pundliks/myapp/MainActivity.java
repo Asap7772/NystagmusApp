@@ -17,20 +17,24 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    int nbars = 0;
-    int nvertices = 0;
-    float barWidth = 0;
-    float spd = 0.0f;
-    float tan1deg = 0.01745506492821758576512889521973f;
-    private int screenWidth, screenHeight;
-
+    public static final String EXTRA_PPD = "EXTRA_PPD";
     public static final String EXTRA_VERTICES = "EXTRA_VERTICES";
     public static final String EXTRA_SPEED = "EXTRA_SPEED";
     public static final String EXTRA_BAR_NUMBER = "EXTRA_BAR_NUMBER";
     public static final String EXTRA_BAR_WIDTH = "EXTRA_BAR_WIDTH";
     public static final String EXTRA_SCREEN_WIDTH = "EXTRA_SCREEN_WIDTH";
     public static final String EXTRA_SCREEN_HEIGHT = "EXTRA_SCREEN_HEIGHT";
-    private float ppi = 570;
+
+    int nbars = 0;
+    int nvertices = 0;
+    float barWidth = 0;
+    float spd = 0.0f;
+    private float ppd;
+    private int screenWidth, screenHeight;
+
+    public static final float tan1deg = 0.01745506492821758576512889521973f;
+    public static final float ppi = 570;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +63,12 @@ public class MainActivity extends AppCompatActivity {
                     nvertices = (int) val[2];
                     screenWidth = (int) val[3];
                     screenHeight = (int) val[4];
+                    ppd = val[5];
 
                     Intent intent = new Intent(view.getContext(), MyCameraActivity.class);
                     intent.putExtra(EXTRA_VERTICES, nvertices);
                     intent.putExtra(EXTRA_SPEED, spd);
+                    intent.putExtra(EXTRA_PPD, ppd);
                     intent.putExtra(EXTRA_BAR_NUMBER, nbars);
                     intent.putExtra(EXTRA_BAR_WIDTH, barWidth);
                     intent.putExtra(EXTRA_SCREEN_WIDTH, screenWidth);
@@ -123,6 +129,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return new float[]{bw,nbars,nv, dm.widthPixels, dm.heightPixels};
+        return new float[]{bw,nbars,nv, dm.widthPixels, dm.heightPixels, ppd};
     }
 }

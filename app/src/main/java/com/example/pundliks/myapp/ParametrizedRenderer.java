@@ -3,6 +3,7 @@ package com.example.pundliks.myapp;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.util.Arrays;
@@ -12,7 +13,10 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class ParametrizedRenderer implements GLSurfaceView.Renderer {
 
-    private int screenWidth, screenHeight;
+    private float aspectRatio;
+    private int screenWidth;
+    private int screenHeight;
+    private float ppd;
     private int vertices, numBars;
     private float widthBars, speed;
     private float[] shapeCoords;
@@ -24,20 +28,28 @@ public class ParametrizedRenderer implements GLSurfaceView.Renderer {
     private final float[] mViewMatrix = new float[16];
     private float[] mRotationMatrix = new float[16];
 
+    public static final int FPS = 60;
+
     private static final String TAG = "MyRenderer";
 
     private float xpos = 0.0f;
     private float increment = 0.01f;
     private float aa = 0.571429f;
     private long prevTime = 0;
+    private float timeThisRound;
+    private float deltaTimeThisRound;
+    private float timeLastRound;
+    private float lastMin;
 
-    public ParametrizedRenderer(int vertices, int numBars, float widthBars, float speed,int screenWidth, int screenHeight) {
+    public ParametrizedRenderer(int vertices, int numBars, float widthBars, float speed, int screenWidth, int screenHeight, float ppd) {
         this.vertices = vertices;
         this.numBars = numBars;
         this.widthBars = widthBars;
         this.speed = speed;
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
+        this.ppd = ppd;
+        this.aspectRatio = (float)Math.max(screenWidth,screenHeight)/Math.min(screenHeight,screenWidth);
     }
 
     @Override
@@ -63,7 +75,7 @@ public class ParametrizedRenderer implements GLSurfaceView.Renderer {
 
     private void generateRectangles(){
         aa = widthBars/Math.max(this.screenHeight, this.screenWidth);
-        increment = aa/10.0f;
+        increment = speed*ppd/FPS/(screenHeight/4.0f);
         shapeCoords = new float[3*(vertices+4)];
 
         int vNum = 0;
@@ -153,6 +165,7 @@ public class ParametrizedRenderer implements GLSurfaceView.Renderer {
         return shader;
     }
 
+    @Override
     public void onDrawFrame(GL10 unused) {
 
         float[] scratch = new float[16];
@@ -163,12 +176,6 @@ public class ParametrizedRenderer implements GLSurfaceView.Renderer {
         xpos = xpos + increment;
         if (xpos >= 4*aa)
             xpos = 0.0f;
-
-        //-- Create a rotation transformation for the triangle
-        //long time = SystemClock.uptimeMillis() % 4000L;
-        //float angle = 0.00090f * ((int) time);
-
-        //Log.d(TAG, "time = " + time + ", angle = " + angle);
 
         //Matrix.setRotateM(mRotationMatrix, 0, angle, 0, 0, -1.0f);
         Matrix.setIdentityM(mRotationMatrix, 0);

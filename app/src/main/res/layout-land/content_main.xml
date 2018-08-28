@@ -37,7 +37,7 @@
             android:singleLine="true"
             android:text=""
             android:textSize="@dimen/textSize"
-            android:inputType="number"/>
+            android:inputType="numberDecimal|numberSigned"/>
     </LinearLayout>
 
     <LinearLayout
@@ -61,7 +61,7 @@
             android:singleLine="true"
             android:text=""
             android:textSize="@dimen/textSize"
-            android:inputType="number"/>
+            android:inputType="numberDecimal|numberSigned"/>
     </LinearLayout>
 
     <LinearLayout
@@ -85,7 +85,7 @@
             android:singleLine="true"
             android:text=""
             android:textSize="@dimen/textSize"
-            android:inputType="number"/>
+            android:inputType="numberDecimal|numberSigned"/>
     </LinearLayout>
 
 
