@@ -1,4 +1,4 @@
-package com.example.pundliks.myapp;
+package com.example.pundliks.stripes;
 
 import android.content.Intent;
 import android.os.Bundle;

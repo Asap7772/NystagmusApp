@@ -1,4 +1,4 @@
-package com.example.pundliks.myapp;
+package com.example.pundliks.stripes;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

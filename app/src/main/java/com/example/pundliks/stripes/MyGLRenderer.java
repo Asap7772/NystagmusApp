@@ -1,10 +1,8 @@
-package com.example.pundliks.myapp;
+package com.example.pundliks.stripes;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-import android.os.SystemClock;
-import android.util.Log;
 
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.EGLConfig;

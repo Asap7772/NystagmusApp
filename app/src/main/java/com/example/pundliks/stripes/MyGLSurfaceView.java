@@ -1,20 +1,10 @@
-package com.example.pundliks.myapp;
+package com.example.pundliks.stripes;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.os.Environment;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
-
-import com.wonderkiln.camerakit.CameraKit;
-import com.wonderkiln.camerakit.CameraKitEventCallback;
-import com.wonderkiln.camerakit.CameraKitVideo;
-import com.wonderkiln.camerakit.CameraView;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 class MyGLSurfaceView extends GLSurfaceView {
     private final ParametrizedRenderer mRenderer;
