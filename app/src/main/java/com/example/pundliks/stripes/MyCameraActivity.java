@@ -94,25 +94,6 @@ public class MyCameraActivity extends AppCompatActivity {
                 File to = getOutputMediaFile();
                 from.renameTo(to);
             }
-
-            private String fileExt(String url) {
-                if (url.indexOf("?") > -1) {
-                    url = url.substring(0, url.indexOf("?"));
-                }
-                if (url.lastIndexOf(".") == -1) {
-                    return null;
-                } else {
-                    String ext = url.substring(url.lastIndexOf(".") + 1);
-                    if (ext.indexOf("%") > -1) {
-                        ext = ext.substring(0, ext.indexOf("%"));
-                    }
-                    if (ext.indexOf("/") > -1) {
-                        ext = ext.substring(0, ext.indexOf("/"));
-                    }
-                    return ext.toLowerCase();
-
-                }
-            }
         });
 
         RelativeLayout layout = new RelativeLayout(this);
@@ -120,7 +101,13 @@ public class MyCameraActivity extends AppCompatActivity {
         mGLView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         cameraView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         FloatingActionButton back = new FloatingActionButton(this);
-        back.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        back.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) back.getLayoutParams();
+        int margin = (int) getResources().getDimension(R.dimen.fab_margin);
+        p.setMargins(margin,margin,margin,margin);
+        back.setLayoutParams(p);
+
         back.setImageResource(R.drawable.back);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,6 +115,7 @@ public class MyCameraActivity extends AppCompatActivity {
                 finish();
             }
         });
+
 
         layout.addView(cameraView);
         layout.addView(mGLView);
