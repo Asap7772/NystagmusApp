@@ -1,15 +1,42 @@
 package com.example.pundliks.myapp;
 
+import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.opengl.GLSurfaceView;
+import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
+import android.media.MediaTimestamp;
+import android.net.Uri;
+import android.os.Environment;
+import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.MimeTypeMap;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.wonderkiln.camerakit.CameraKit;
+import com.wonderkiln.camerakit.CameraKitError;
+import com.wonderkiln.camerakit.CameraKitEvent;
+import com.wonderkiln.camerakit.CameraKitEventListener;
+import com.wonderkiln.camerakit.CameraKitImage;
+import com.wonderkiln.camerakit.CameraKitVideo;
 import com.wonderkiln.camerakit.CameraView;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 //import android.hardware.camera2.CameraDevice;
 //import android.hardware.camera2.CameraManager;
@@ -17,10 +44,13 @@ import com.wonderkiln.camerakit.CameraView;
 
 public class MyCameraActivity extends AppCompatActivity {
 
-    private GLSurfaceView mGLView;
+    private static final int MY_PERMISSIONS_REQUEST_WRITE = 5;
+    private MyGLSurfaceView mGLView;
     private int vertices, numBars;
     private float widthBars, speed;
     private int screenWidth,screenHeight;
+    private CameraView cameraView;
+    private Thread t;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +74,131 @@ public class MyCameraActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN); // (NEW)
 
         mGLView = new MyGLSurfaceView(this,vertices, numBars, widthBars,speed, screenWidth,screenHeight);
-        setContentView(mGLView);
+        cameraView = new CameraView(this);
+
+        cameraView.setFacing(CameraKit.Constants.FACING_FRONT);
+        cameraView.setPermissions(CameraKit.Constants.PERMISSIONS_STRICT);
+
+        cameraView.addCameraKitListener(new CameraKitEventListener() {
+            @Override
+            public void onEvent(CameraKitEvent cameraKitEvent) {
+                Log.e("ERROR", cameraKitEvent.getMessage());
+            }
+
+            @Override
+            public void onError(CameraKitError cameraKitError) {
+                Log.e("ERROR", cameraKitError.getMessage());
+            }
+
+            @Override
+            public void onImage(CameraKitImage cameraKitImage) {
+                Log.e("testing-tag", String.valueOf(cameraKitImage.getJpeg()));
+            }
+
+            @Override
+            public void onVideo(CameraKitVideo cameraKitVideo) {
+                Log.e("testing-tag", String.valueOf(cameraKitVideo.getVideoFile()));
+                File from = cameraKitVideo.getVideoFile();
+                File to = getOutputMediaFile();
+                from.renameTo(to);
+            }
+
+            private String fileExt(String url) {
+                if (url.indexOf("?") > -1) {
+                    url = url.substring(0, url.indexOf("?"));
+                }
+                if (url.lastIndexOf(".") == -1) {
+                    return null;
+                } else {
+                    String ext = url.substring(url.lastIndexOf(".") + 1);
+                    if (ext.indexOf("%") > -1) {
+                        ext = ext.substring(0, ext.indexOf("%"));
+                    }
+                    if (ext.indexOf("/") > -1) {
+                        ext = ext.substring(0, ext.indexOf("/"));
+                    }
+                    return ext.toLowerCase();
+
+                }
+            }
+        });
+
+        RelativeLayout layout = new RelativeLayout(this);
+        layout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        mGLView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        cameraView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        layout.addView(cameraView);
+        layout.addView(mGLView);
+
+        setContentView(layout);
+
+
         //setContentView(R.layout.activity_my_camera);
 
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_WRITE);
+        }
+
+        t = new Thread() {
+            @Override
+            public void run() {
+                while(!mGLView.isVideo()){}
+                cameraView.captureVideo();
+                while(!mGLView.isCaptured()){}
+                cameraView.stopVideo();
+            }
+        };
+
+        t.start();
+
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        cameraView.stop();
+        if(t != null){
+            t.interrupt();
+            t = null;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        cameraView.start();
+        if(t != null){
+            t.interrupt();
+            t = null;
+        }
+    }
+
+    private File getOutputMediaFile() {
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_MOVIES), "OpenGLES");
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d("SupervisionSearch", "failed to create directory");
+                return null;
+            }
+        }
+
+        Date d = new Date();
+        // Create a media file name
+        File mediaFile = new File(mediaStorageDir.getPath() + File.separator+d.getTime()+"_video.mp4");
+
+        return mediaFile;
+    }
+
 }
 
 

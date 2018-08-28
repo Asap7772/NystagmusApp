@@ -2,13 +2,17 @@ package com.example.pundliks.myapp;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.os.Environment;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
 import com.wonderkiln.camerakit.CameraKit;
+import com.wonderkiln.camerakit.CameraKitEventCallback;
+import com.wonderkiln.camerakit.CameraKitVideo;
 import com.wonderkiln.camerakit.CameraView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -18,9 +22,7 @@ class MyGLSurfaceView extends GLSurfaceView {
     private int vertices, numBars;
     private float widthBars, speed;
     private int screenWidth,screenHeight;
-    private CameraView cameraView;
-    boolean video = false;
-    boolean captured = false;
+    private boolean video, captured;
 
     public MyGLSurfaceView(final Context context, int vertices, int numBars, float width, float speed, int screenWidth, int screenHeight) {
         super(context);
@@ -39,20 +41,25 @@ class MyGLSurfaceView extends GLSurfaceView {
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(mRenderer);
 
-        cameraView = new CameraView(context);
-        cameraView.setFacing(CameraKit.Constants.FACING_FRONT);
-        cameraView.setVideoQuality(CameraKit.Constants.VIDEO_QUALITY_HIGHEST);
-
 
         this.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Toast.makeText(context,"Tapped",Toast.LENGTH_SHORT).show();
+                if(video){
+                    if(captured){
+                        Toast.makeText(context, "Video already Captured", Toast.LENGTH_SHORT).show();
+                    }else{
+                        captured = true;
+                        Toast.makeText(context, "Video Stopped", Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    video = true;
+                    Toast.makeText(context, "Started Video", Toast.LENGTH_SHORT).show();
+                }
                 return false;
             }
         });
     }
-
 
     public int getVertices() {
         return vertices;
@@ -100,5 +107,22 @@ class MyGLSurfaceView extends GLSurfaceView {
 
     public void setScreenHeight(int screenHeight) {
         this.screenHeight = screenHeight;
+    }
+
+
+    public boolean isVideo() {
+        return video;
+    }
+
+    public void setVideo(boolean video) {
+        this.video = video;
+    }
+
+    public boolean isCaptured() {
+        return captured;
+    }
+
+    public void setCaptured(boolean captured) {
+        this.captured = captured;
     }
 }

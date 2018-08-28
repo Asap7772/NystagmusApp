@@ -184,11 +184,6 @@ public class ParametrizedRenderer implements GLSurfaceView.Renderer {
 
         //mRect.draw(mMVPMatrix);
         mRect.draw(scratch);
-
-        if(System.currentTimeMillis()-prevTime > 250) {
-            Log.d(TAG, this.toString());
-            prevTime = System.currentTimeMillis();
-        }
     }
 
     public int getVertices() {
